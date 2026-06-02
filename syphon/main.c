@@ -98,8 +98,26 @@ int main(void) {
                                 g_steps[si].child_pid_addr,
                                 sizeof(spawned),
                                 (mach_vm_address_t)&spawned, &s);
-                        if (kr == KERN_SUCCESS)
-                            printf(" spawned-pid=%d\n", spawned);
+                        if (kr == KERN_SUCCESS) {
+                            printf(" spawned-pid=%d", spawned);
+                            task_t child;
+                            kr = task_for_pid(mach_task_self(),
+                                    spawned, &child);
+                            if (kr == KERN_SUCCESS) {
+                                kr = task_set_exception_ports(child,
+                                        EXC_MASK_BREAKPOINT,
+                                        g_exc_port,
+                                        EXCEPTION_DEFAULT
+                                        | MACH_EXCEPTION_CODES,
+                                        ARM_THREAD_STATE64);
+                                mach_port_deallocate(mach_task_self(),
+                                                     child);
+                            }
+                            printf(kr == KERN_SUCCESS
+                                   ? " (\xe2\x9c\x93)\n"
+                                   : " (\xe2\x9c\x97)\n");
+                            fflush(stdout);
+                        }
                     }
                     fflush(stdout);
 
