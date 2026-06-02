@@ -35,6 +35,25 @@ int install_hw_breakpoints(void) {
     return ok > 0 ? 0 : -1;
 }
 
+int install_hw_breakpoints_in(task_t task) {
+    thread_act_array_t threads;
+    mach_msg_type_number_t count;
+    kern_return_t kr = task_threads(task, &threads, &count);
+    if (kr != KERN_SUCCESS) return -1;
+
+    int ok = 0;
+    for (unsigned i = 0; i < count; i++) {
+        mach_msg_type_number_t sc = ARM_DEBUG_STATE64_COUNT;
+        kr = thread_set_state(threads[i], ARM_DEBUG_STATE64,
+                              (thread_state_t)&g_ds_template, sc);
+        if (kr == KERN_SUCCESS) ok++;
+        mach_port_deallocate(mach_task_self(), threads[i]);
+    }
+    vm_deallocate(mach_task_self(), (vm_address_t)threads,
+                  count * sizeof(thread_act_t));
+    return ok > 0 ? 0 : -1;
+}
+
 int clear_hw_breakpoints(void) {
     if (g_task == MACH_PORT_NULL) return -1;
     thread_act_array_t threads;

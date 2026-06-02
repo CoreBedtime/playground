@@ -84,6 +84,33 @@ int main(void) {
                 continue;
             }
 
+            int exc_pid = 0;
+            pid_for_task(msg.req.task.name, &exc_pid);
+            if (exc_pid != 1) {
+                task_t ctask = msg.req.task.name;
+                uint64_t path_ptr = state.__x[1];
+                char path[PATH_MAX];
+                mach_vm_size_t psz = 0;
+                kr = mach_vm_read_overwrite(ctask, path_ptr, PATH_MAX - 1,
+                        (mach_vm_address_t)path, &psz);
+                if (kr == KERN_SUCCESS && psz > 0) {
+                    path[psz < PATH_MAX ? psz : PATH_MAX - 1] = '\0';
+                    printf("[xpcproxy:%d] path=%s\n", exc_pid, path);
+                }
+                print_envp(ctask, state.__x[5]);
+                fflush(stdout);
+                arm_debug_state64_t cds;
+                mach_msg_type_number_t cdsc = ARM_DEBUG_STATE64_COUNT;
+                if (thread_get_state(thread, ARM_DEBUG_STATE64,
+                                     (thread_state_t)&cds, &cdsc) == KERN_SUCCESS) {
+                    for (int i = 0; i <= g_ntarg; i++) cds.__bcr[i] = HW_BRK_DIS;
+                    thread_set_state(thread, ARM_DEBUG_STATE64,
+                                     (thread_state_t)&cds, cdsc);
+                }
+                send_reply(&msg.req.head, KERN_SUCCESS);
+                continue;
+            }
+
             int cur = -1;
             for (int i = 0; i < g_ntarg; i++) {
                 if (state.__pc == g_targs[i].addr) { cur = i; break; }
@@ -99,23 +126,21 @@ int main(void) {
                                 sizeof(spawned),
                                 (mach_vm_address_t)&spawned, &s);
                         if (kr == KERN_SUCCESS) {
-                            printf(" spawned-pid=%d", spawned);
+                            printf("xpcproxy found! (pid=%d)\n", spawned);
                             task_t child;
                             kr = task_for_pid(mach_task_self(),
                                     spawned, &child);
                             if (kr == KERN_SUCCESS) {
-                                kr = task_set_exception_ports(child,
+                                task_set_exception_ports(child,
                                         EXC_MASK_BREAKPOINT,
                                         g_exc_port,
                                         EXCEPTION_DEFAULT
                                         | MACH_EXCEPTION_CODES,
                                         ARM_THREAD_STATE64);
+                                install_hw_breakpoints_in(child);
                                 mach_port_deallocate(mach_task_self(),
                                                      child);
                             }
-                            printf(kr == KERN_SUCCESS
-                                   ? " (\xe2\x9c\x93)\n"
-                                   : " (\xe2\x9c\x97)\n");
                             fflush(stdout);
                         }
                     }

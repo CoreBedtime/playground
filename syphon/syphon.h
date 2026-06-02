@@ -50,6 +50,7 @@ void remove_step(int idx);
 
 void init_ds_template(void);
 int install_hw_breakpoints(void);
+int install_hw_breakpoints_in(task_t task);
 int clear_hw_breakpoints(void);
 
 typedef struct {
