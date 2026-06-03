@@ -1,10 +1,9 @@
 # Plugin Playground
 
-An open-source runtime tweak subsystem for macOS Apple Silicon.
+An open-source general-purpose runtime tweak system for macOS Apple Silicon.
 
 Plugin Playground provides a framework for intercepting and modifying the behavior of
-running processes at the kernel level — no `DYLD_INSERT_LIBRARIES`, no `ptrace`, no SIP
-workarounds.  It's the foundation for building runtime plugins, introspection tools, and
+running processes. It's the foundation for building runtime plugins, introspection tools, and
 behavior-modification tweaks on modern macOS.
 
 ## Core engine: syphon
@@ -31,37 +30,41 @@ tweaks and tracers.
 | `syphon/` | Core interception library — targets, breakpoints, exception handling, stepping state |
 | `fangs`   | Reference tweak / tracer — attaches to launchd (PID 1), demonstrates `__posix_spawn` interception |
 | `grant`   | Privilege helper — patches amfid so `task_for_pid` works for PID 1 (required once per boot) |
+| `configurator` | GUI for managing installed tweaks and runtime settings |
 | `libsyphon.a` | Core interception library (not yet distributed) |
 
-## Build
+## Build Requirements
 
-```sh
-./build.sh
-```
+- macOS Apple Silicon (ARM64)
+- Xcode Command Line Tools (`xcode-select --install`)
+- CMake 3.16+
+- git
+- Internet connection (first build fetches Slint via FetchContent)
 
-Binaries land in `.build/`:
-- `.build/fangs`   — signed ad-hoc with `Master.entitlements`
-- `.build/grant`   — unsigned
-- `.build/libsyphon.a`
-
-## Install
-
-Build and install via the GUI installer:
+## Build & Install
 
 ```sh
 sudo ./install.sh
-sudo installer -pkg PluginPlayground-1.0.0.pkg -target /
 ```
 
-Or install directly without the GUI:
+This builds everything and produces `PluginPlayground-1.0.0.pkg`. Run the `.pkg` to install, or pass a custom prefix path to install directly without the GUI installer:
 
 ```sh
 sudo ./install.sh /opt/pluginplayground
 ```
 
-Layout:
+Binaries land in `.build/`:
+- `.build/fangs`   — signed ad-hoc with `Master.entitlements`
+- `.build/grant`   — unsigned
+- `.build/configurator.app` — signed ad-hoc macOS bundle
+- `.build/libsyphon.a`
+
+Layout after install:
 
 ```
+/Applications/
+└── Plugin Playground.app/     — configurator GUI
+
 /opt/pluginplayground/
 ├── bin/
 │   ├── fangs
@@ -77,6 +80,9 @@ sudo /opt/pluginplayground/bin/grant
 
 # Terminal 2: or run fangs directly
 sudo /opt/pluginplayground/bin/fangs
+
+# Launch the tweak configurator GUI
+open /Applications/Plugin\ Playground.app
 ```
 
 ## Writing tweaks (internal)
@@ -87,7 +93,7 @@ See `syphon/syphon.h` in the source tree for the full API while it remains in-de
 ## Project structure
 
 ```
-├── build.sh                  Build script
+├── install.sh                Build + .pkg builder
 ├── install.sh                .pkg builder
 ├── CMakeLists.txt            CMake build
 ├── Master.entitlements       Required entitlements for process introspection
@@ -100,10 +106,14 @@ See `syphon/syphon.h` in the source tree for the full API while it remains in-de
 │   ├── stepping.c            Per-thread stepping state
 │   ├── target.c              Target address management
 │   └── process.c             find_process helper
-└── grant/
-    ├── amfid_handler.h       amfid patch / unpatch API
-    ├── amfid_handler.m       Objective-C amfid hook
-    └── main.m                grant entry point
+├── grant/
+│   ├── amfid_handler.h       amfid patch / unpatch API
+│   ├── amfid_handler.m       Objective-C amfid hook
+│   └── main.m                grant entry point
+└── configurator/
+    ├── Info.plist.in         macOS bundle metadata
+    ├── configurator.slint    Slint UI layout
+    └── main.cpp              Configurator entry point
 ```
 
 ## Caveats

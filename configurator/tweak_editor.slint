@@ -1,0 +1,108 @@
+import { Button, VerticalBox, ScrollView, ListView, LineEdit } from "std-widgets.slint";
+
+export component TweakEditor inherits Window {
+    width: 500px;
+    height: 440px;
+    title: "Tweak Options";
+
+    in property <string> tweak-name;
+    in-out property <[string]> blacklisted-apps;
+    in-out property <[string]> framework-deps;
+
+    callback add-blacklisted(string);
+    callback add-framework-dep(string);
+    callback remove-blacklisted(string);
+    callback remove-framework-dep(string);
+    callback save();
+    callback cancel();
+
+    VerticalBox {
+        padding: 16px;
+        spacing: 8px;
+
+        Text {
+            text: root.tweak-name + " Options";
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        Text { text: "Blacklisted Applications"; font-weight: 600; }
+
+        ScrollView { vertical-stretch: 1;
+            ListView {
+                for app in root.blacklisted-apps: HorizontalLayout {
+                    spacing: 8px;
+                    padding-top: 4px;
+                    padding-bottom: 4px;
+                    Text {
+                        text: app;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                    }
+                    Button {
+                        text: "-";
+                        min-width: 28px;
+                        clicked => { root.remove-blacklisted(app); }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            i-bl-input := LineEdit {
+                placeholder-text: "Bundle ID (e.g. com.apple.Safari)...";
+                horizontal-stretch: 1;
+                accepted => { root.add-blacklisted(self.text); self.text = ""; }
+            }
+            Button {
+                text: "+ Add";
+                min-width: 60px;
+                clicked => { root.add-blacklisted(i-bl-input.text); i-bl-input.text = ""; }
+            }
+        }
+
+        Text { text: "Framework Dependencies"; font-weight: 600; }
+
+        ScrollView { vertical-stretch: 1;
+            ListView {
+                for dep in root.framework-deps: HorizontalLayout {
+                    spacing: 8px;
+                    padding-top: 4px;
+                    padding-bottom: 4px;
+                    Text {
+                        text: dep;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                    }
+                    Button {
+                        text: "-";
+                        min-width: 28px;
+                        clicked => { root.remove-framework-dep(dep); }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            i-fw-input := LineEdit {
+                placeholder-text: "Framework path...";
+                horizontal-stretch: 1;
+                accepted => { root.add-framework-dep(self.text); self.text = ""; }
+            }
+            Button {
+                text: "+ Add";
+                min-width: 60px;
+                clicked => { root.add-framework-dep(i-fw-input.text); i-fw-input.text = ""; }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            HorizontalLayout { horizontal-stretch: 1; }
+            Button { text: "Save"; min-width: 80px; clicked => { root.save(); } }
+            Button { text: "Cancel"; min-width: 80px; clicked => { root.cancel(); } }
+        }
+    }
+}

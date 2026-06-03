@@ -1,0 +1,219 @@
+import { CheckBox, Button, VerticalBox, ScrollView, ListView, LineEdit } from "std-widgets.slint";
+
+export struct TweakInfo {
+    name: string,
+    disabled: bool,
+    icon: image,
+}
+
+export component MainWindow inherits Window {
+    width: 560px;
+    height: 440px;
+    title: "Plugin Playground Configurator";
+
+    in-out property <bool> use-legacy-ammonia;
+    in-out property <bool> disable-pac;
+    in-out property <bool> pause-injection;
+    in property <[TweakInfo]> tweaks;
+    in property <bool> dev-tools-available;
+    in property <string> status-message;
+    in-out property <image> default-icon: @image-url("drill.png");
+
+    callback save();
+    callback edit-tweak(string);
+    callback toggle-tweak(string);
+    callback package-tweak(string);
+
+    VerticalBox {
+        padding: 16px;
+        spacing: 12px;
+
+        Text { text: "Settings"; font-weight: 700; }
+
+        CheckBox { text: "Use legacy Ammonia tweaks folder"; checked <=> root.use-legacy-ammonia; }
+        CheckBox { text: "Disable PAC in newly spawned programs"; checked <=> root.disable-pac; }
+        CheckBox { text: "Pause tweak injection"; checked <=> root.pause-injection; }
+
+        Text { text: "Installed Tweaks"; font-weight: 700; }
+
+        ScrollView { vertical-stretch: 1;
+            ListView {
+                for tweak in root.tweaks: HorizontalLayout {
+                    spacing: 8px;
+                    padding: 8px;
+                    Image {
+                        source: tweak.icon;
+                        width: 24px;
+                        height: 24px;
+                    }
+                    VerticalLayout {
+                        spacing: 2px;
+                        Text {
+                            text: tweak.name;
+                            font-size: 14px;
+                            font-weight: 600;
+                        }
+                        HorizontalLayout {
+                            spacing: 4px;
+                            Rectangle {
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 4px;
+                                background: tweak.disabled ? #e74c3c : #2ecc71;
+                            }
+                            Text {
+                                text: tweak.disabled ? "Disabled" : "Enabled";
+                                font-size: 11px;
+                                color: tweak.disabled ? #e74c3c : #2ecc71;
+                            }
+                        }
+                    }
+                    HorizontalLayout { horizontal-stretch: 1; }
+                    HorizontalLayout {
+                        spacing: 4px;
+                        Button {
+                            text: "Edit";
+                            min-width: 72px;
+                            clicked => { root.edit-tweak(tweak.name); }
+                        }
+                        Button {
+                            text: tweak.disabled ? "Enable" : "Disable";
+                            min-width: 72px;
+                            clicked => { root.toggle-tweak(tweak.name); }
+                        }
+                        Button {
+                            text: "Package";
+                            visible: root.dev-tools-available;
+                            min-width: 72px;
+                            clicked => { root.package-tweak(tweak.name); }
+                        }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            Button {
+                text: "Save Settings";
+                min-width: 120px;
+                clicked => { root.save(); }
+            }
+            HorizontalLayout { horizontal-stretch: 1; }
+        }
+
+        Text {
+            text: root.status-message;
+            color: #888;
+            font-size: 12px;
+            visible: root.status-message != "";
+        }
+    }
+}
+
+export component TweakEditor inherits Window {
+    width: 500px;
+    height: 440px;
+    title: "Tweak Options";
+
+    in property <string> tweak-name;
+    in-out property <[string]> blacklisted-apps;
+    in-out property <[string]> framework-deps;
+
+    callback add-blacklisted(string);
+    callback add-framework-dep(string);
+    callback remove-blacklisted(string);
+    callback remove-framework-dep(string);
+    callback save();
+    callback cancel();
+
+    VerticalBox {
+        padding: 16px;
+        spacing: 8px;
+
+        Text {
+            text: root.tweak-name + " Options";
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        Text { text: "Blacklisted Applications"; font-weight: 600; }
+
+        ScrollView { vertical-stretch: 1;
+            ListView {
+                for app in root.blacklisted-apps: HorizontalLayout {
+                    spacing: 8px;
+                    padding-top: 4px;
+                    padding-bottom: 4px;
+                    Text {
+                        text: app;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                    }
+                    Button {
+                        text: "-";
+                        min-width: 28px;
+                        clicked => { root.remove-blacklisted(app); }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            i-bl-input := LineEdit {
+                placeholder-text: "Bundle ID (e.g. com.apple.Safari)...";
+                horizontal-stretch: 1;
+                accepted => { root.add-blacklisted(self.text); self.text = ""; }
+            }
+            Button {
+                text: "+ Add";
+                min-width: 60px;
+                clicked => { root.add-blacklisted(i-bl-input.text); i-bl-input.text = ""; }
+            }
+        }
+
+        Text { text: "Framework Dependencies"; font-weight: 600; }
+
+        ScrollView { vertical-stretch: 1;
+            ListView {
+                for dep in root.framework-deps: HorizontalLayout {
+                    spacing: 8px;
+                    padding-top: 4px;
+                    padding-bottom: 4px;
+                    Text {
+                        text: dep;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                    }
+                    Button {
+                        text: "-";
+                        min-width: 28px;
+                        clicked => { root.remove-framework-dep(dep); }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            i-fw-input := LineEdit {
+                placeholder-text: "Framework path...";
+                horizontal-stretch: 1;
+                accepted => { root.add-framework-dep(self.text); self.text = ""; }
+            }
+            Button {
+                text: "+ Add";
+                min-width: 60px;
+                clicked => { root.add-framework-dep(i-fw-input.text); i-fw-input.text = ""; }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            HorizontalLayout { horizontal-stretch: 1; }
+            Button { text: "Save"; min-width: 80px; clicked => { root.save(); } }
+            Button { text: "Cancel"; min-width: 80px; clicked => { root.cancel(); } }
+        }
+    }
+}

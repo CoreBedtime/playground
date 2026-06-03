@@ -96,40 +96,117 @@ int main(void) {
                 mach_vm_size_t psz = 0;
                 kr = mach_vm_read_overwrite(ctask, path_ptr, PATH_MAX - 1,
                         (mach_vm_address_t)path, &psz);
-                if (kr == KERN_SUCCESS && psz > 0) {
+                int path_ok = (kr == KERN_SUCCESS && psz > 0 && path[0] == '/');
+                if (path_ok) {
                     path[psz < PATH_MAX ? psz : PATH_MAX - 1] = '\0';
                     printf("[xpcproxy:%d] path=%s\n", exc_pid, path);
+                    print_envp(ctask, state.__x[5]);
                 }
-                print_envp(ctask, state.__x[5]);
                 fflush(stdout);
-                char *new_path = getready_process(path);
-                if (new_path) {
-                    if (strcmp(new_path, path) != 0) {
-                        size_t new_len = strlen(new_path) + 1;
-                        kr = mach_vm_write(ctask, path_ptr,
-                                           (vm_offset_t)new_path,
-                                           (mach_msg_type_number_t)new_len);
-                        if (kr == KERN_SUCCESS) {
-                            printf("[xpcproxy:%d] -> %s\n", exc_pid, new_path);
-                            printf("  (overwrote %zu bytes at 0x%llx)\n",
-                                   new_len, path_ptr);
-                        } else {
-                            printf("[xpcproxy:%d] redirect write failed: %s\n",
-                                   exc_pid, mach_error_string(kr));
+                if (path_ok) {
+                    if (strcmp("/System/Library/CoreServices/Dock.app/Contents/MacOS/Dock", path) != 0) {
+                        char *new_path = getready_process(path);
+                        if (new_path) {
+                            if (strcmp(new_path, path) != 0) {
+                                size_t new_len = strlen(new_path) + 1;
+                                kr = mach_vm_write(ctask, path_ptr,
+                                                   (vm_offset_t)new_path,
+                                                   (mach_msg_type_number_t)new_len);
+                                if (kr == KERN_SUCCESS)
+                                    printf("[xpcproxy:%d] -> %s\n", exc_pid, new_path);
+                                else
+                                    printf("[xpcproxy:%d] redirect write failed: %s\n",
+                                           exc_pid, mach_error_string(kr));
+                                fflush(stdout);
+                            }
+                            free(new_path);
                         }
-                        fflush(stdout);
                     }
-                    free(new_path);
+                    uint64_t envp_addr = state.__x[5];
+                    char *env_ptrs[512];
+                    mach_vm_size_t env_out = 0;
+                    kr = mach_vm_read_overwrite(ctask, envp_addr,
+                            sizeof(env_ptrs), (mach_vm_address_t)env_ptrs, &env_out);
+                    if (kr == KERN_SUCCESS) {
+                        int count = 0;
+                        int max = env_out / sizeof(char *);
+                        for (int i = 0; i < max && env_ptrs[i]; i++) count++;
+                        const char *inject = "DYLD_INSERT_LIBRARIES=/private/var/ammonia/core/libopener.dylib";
+                        int found = 0;
+                        for (int i = 0; i < count && !found; i++) {
+                            char buf[512];
+                            mach_vm_size_t bs = 0;
+                            kern_return_t r = mach_vm_read_overwrite(ctask,
+                                    (mach_vm_address_t)env_ptrs[i], sizeof(buf) - 1,
+                                    (mach_vm_address_t)buf, &bs);
+                            if (r == KERN_SUCCESS && bs > 0) {
+                                buf[bs < sizeof(buf) ? bs : sizeof(buf) - 1] = '\0';
+                                if (strncmp(buf, "DYLD_INSERT_LIBRARIES=", 22) == 0)
+                                    found = 1;
+                            }
+                        }
+                        if (!found && count > 0) {
+                            size_t inject_len = strlen(inject) + 1;
+                            mach_vm_address_t stack_dest =
+                                (state.__sp - 4096) & ~(mach_vm_address_t)0xF;
+                            kr = mach_vm_write(ctask, stack_dest,
+                                    (vm_offset_t)inject,
+                                    (mach_msg_type_number_t)inject_len);
+                            if (kr == KERN_SUCCESS) {
+                                uint64_t null_term_addr = envp_addr +
+                                    (uint64_t)count * sizeof(char *);
+                                unsigned char auxv_buf[4096];
+                                mach_vm_size_t auxv_sz = 0;
+                                kr = mach_vm_read_overwrite(ctask,
+                                        null_term_addr + 8, sizeof(auxv_buf),
+                                        (mach_vm_address_t)auxv_buf, &auxv_sz);
+                                if (kr == KERN_SUCCESS) {
+                                    int auxv_len = 0;
+                                    int auxv_max = auxv_sz / 16;
+                                    for (int i = 0; i < auxv_max; i++) {
+                                        int key = *(int *)(auxv_buf + i * 16);
+                                        if (key == 0) { auxv_len = (i + 1) * 16; break; }
+                                    }
+                                    if (auxv_len > 0) {
+                                        mach_vm_write(ctask,
+                                                null_term_addr + 8 + 16,
+                                                (vm_offset_t)auxv_buf,
+                                                (mach_msg_type_number_t)auxv_len);
+                                    }
+                                }
+                                uint64_t new_ptr = stack_dest;
+                                uint64_t new_entries[2] = { new_ptr, 0 };
+                                kr = mach_vm_write(ctask, null_term_addr,
+                                        (vm_offset_t)new_entries, 16);
+                                if (kr == KERN_SUCCESS)
+                                    printf("[xpcproxy:%d] envp +DYLD_INSERT_LIBRARIES\n",
+                                           exc_pid);
+                                else
+                                    printf("[xpcproxy:%d] envp write failed: %s\n",
+                                exc_pid, mach_error_string(kr));
+                            } else {
+                                printf("[xpcproxy:%d] envp string write failed: %s\n",
+                                        exc_pid, mach_error_string(kr));
+                            }
+                        }
+                    }
                 }
                 arm_debug_state64_t cds;
                 mach_msg_type_number_t cdsc = ARM_DEBUG_STATE64_COUNT;
+                int brk_disabled = 0;
                 if (thread_get_state(thread, ARM_DEBUG_STATE64,
                                      (thread_state_t)&cds, &cdsc) == KERN_SUCCESS) {
                     for (int i = 0; i <= g_ntarg; i++) cds.__bcr[i] = HW_BRK_DIS;
-                    thread_set_state(thread, ARM_DEBUG_STATE64,
-                                     (thread_state_t)&cds, cdsc);
+                    kern_return_t dkr = thread_set_state(thread, ARM_DEBUG_STATE64,
+                                          (thread_state_t)&cds, cdsc);
+                    if (dkr == KERN_SUCCESS) {
+                        brk_disabled = 1;
+                    } else {
+                        printf("[xpcproxy:%d] brk disable failed: %s\n",
+                               exc_pid, mach_error_string(dkr));
+                    }
                 }
-                send_reply(&msg.req.head, KERN_SUCCESS);
+                send_reply(&msg.req.head, brk_disabled ? KERN_SUCCESS : KERN_FAILURE);
                 continue;
             }
 

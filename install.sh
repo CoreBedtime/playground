@@ -16,9 +16,11 @@ trap "rm -rf '$STAGING'" EXIT
 
 PKG_ROOT="$STAGING/root/opt/pluginplayground"
 mkdir -p "$PKG_ROOT/bin" "$PKG_ROOT/tweaks"
+mkdir -p "$STAGING/root/Applications"
 
-cp "$SRC/.build/fangs"     "$PKG_ROOT/bin/"
-cp "$SRC/.build/grant"     "$PKG_ROOT/bin/"
+cp "$SRC/.build/fangs"          "$PKG_ROOT/bin/"
+cp "$SRC/.build/grant"          "$PKG_ROOT/bin/"
+cp -R "$SRC/.build/configurator.app" "$STAGING/root/Applications/Plugin Playground.app/"
 
 # tweaks directory owned by the user
 chown "$(id -u):$(id -g)" "$PKG_ROOT/tweaks"
