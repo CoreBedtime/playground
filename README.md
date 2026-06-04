@@ -2,7 +2,8 @@
 
 An open-source general-purpose runtime tweak system for macOS Apple Silicon.
 
-> **Warning** System Integrity Protection (SIP) must be partially disabled — `csrutil enable --without fs` — because the tracer needs `task_for_pid()` access to launchd and the ability to set hardware breakpoints on other processes. SIP only needs to be weakened, not fully off.
+> [!WARNING]
+> System Integrity Protection (SIP) must be partially disabled — `csrutil enable --without fs` — because the tracer needs `task_for_pid()` access to launchd and the ability to set hardware breakpoints on other processes. SIP only needs to be weakened, not fully off.
 
 Plugin Playground provides a framework for intercepting and modifying the behavior of
 running processes. It's the foundation for building runtime plugins, introspection tools, and
