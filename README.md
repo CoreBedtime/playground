@@ -28,6 +28,12 @@ Tweaks are `.dylib` libraries injected into macOS processes at spawn time, befor
 <img src=".pics/ClassicScrollbars.png" height="260" alt="Classic Scrollbars">
 
 
+## Ammonia Legacy Usage
+
+The configurator's **Use legacy Ammonia tweaks folder** option lets Plugin Playground load tweaks from the old Ammonia path `/private/var/ammonia/core/tweaks/` instead of `/opt/pluginplayground/tweaks/`. This is useful if you're migrating from an existing Ammonia setup.
+
+If you use this option, the Ammonia daemon binary at `/private/var/ammonia/core/ammonia` must be disabled or removed first — otherwise Ammonia and Plugin Playground will conflict over injection control. Removing/adding tweaks via the legacy folder often requires a reboot to take full effect.
+
 ## Build Requirements
 
 - macOS Apple Silicon (ARM64)
