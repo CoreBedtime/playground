@@ -2,9 +2,16 @@
 
 An open-source general-purpose runtime tweak system for macOS Apple Silicon.
 
+> **Note** System Integrity Protection (SIP) must be partially disabled — `csrutil enable --without fs` — because the tracer needs `task_for_pid()` access to launchd and the ability to set hardware breakpoints on other processes. SIP only needs to be weakened, not fully off.
+
 Plugin Playground provides a framework for intercepting and modifying the behavior of
 running processes. It's the foundation for building runtime plugins, introspection tools, and
 behavior-modification tweaks on modern macOS.
+
+The fangs tracer must run as **arm64e** (the system ABI for Apple Silicon) to attach
+to launchd. If arm64e is not available on your system, toggle **Disable arm64e (PAC)** in the
+configurator — this strips PAC signing from spawned processes so injection works without the
+native arm64e ABI.
 
 The configuration app is installed to `/Applications/Plugin Playground.app`.
 
