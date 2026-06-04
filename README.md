@@ -14,8 +14,10 @@ The configuration app is installed to `/Applications/Plugin Playground.app`.
 
 Tweaks are `.dylib` libraries injected into macOS processes at spawn time, before `main()` runs. They can modify any aspect of a running app — change UI rendering, alter window management, change system controls, or override literally any framework behavior. The injection is transparent and requires no modification to the target application. Below are two private examples a developer had created with the runtime.
 
-- **Classic Dock** — replaces the modern macOS Dock with a pre-Yosemite style (3D shelf, reflective icons, unified minimize). ![Classic Dock](.pics/ClassicDock.png)
-- **Classic Scrollbars** — restores legacy scrollbars with up/down arrows at both ends and the classic aqua thumb appearance. <img src=".pics/ClassicScrollbars.png" height="260" alt="Classic Scrollbars">
+- **Classic Dock** — replaces the modern macOS Dock with a pre-Yosemite style (3D shelf, reflective icons, unified minimize).
+![Classic Dock](.pics/ClassicDock.png)
+- **Classic Scrollbars** — restores legacy scrollbars with up/down arrows at both ends and the classic aqua thumb appearance. 
+<img src=".pics/ClassicScrollbars.png" height="260" alt="Classic Scrollbars">
 
 
 ## Build Requirements
