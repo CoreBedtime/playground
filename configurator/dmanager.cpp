@@ -21,7 +21,7 @@ DaemonStatus DaemonManager::status() {
     if (access(path.c_str(), F_OK) != 0)
         return DaemonStatus::NotInstalled;
 
-    std::string cmd = "launchctl list com.pluginplayground.grant >/dev/null 2>&1";
+    std::string cmd = "launchctl print system/com.pluginplayground.grant >/dev/null 2>&1";
     if (system(cmd.c_str()) == 0)
         return DaemonStatus::InstalledRunning;
     return DaemonStatus::InstalledStopped;
