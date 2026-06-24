@@ -53,3 +53,12 @@ sh ./install.sh
 ```
 
 This builds everything and produces `PluginPlayground-1.0.0.pkg`. Run the `.pkg` to install, or pass a custom prefix path to install directly without the GUI installer:
+
+## Documentation
+
+- [Ammonia (Legacy)](docs/ammonia.md)
+- [Compilation](docs/compilation.md)
+- [Configurator](docs/configurator.md)
+- [Defaults CLI](docs/defaults.md)
+- [Fangs](docs/fangs.md)
+- [Grant](docs/grant.md)

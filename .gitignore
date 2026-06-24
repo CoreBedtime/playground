@@ -4,3 +4,8 @@ compile_commands.json
 .DS_Store
 *.dSYM/
 *.pkg
+
+# Nix
+result
+result-*
+.direnv/
