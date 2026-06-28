@@ -275,10 +275,10 @@ amfid_patch(void)
 FindAMFI:
     pid = find_amfid_pid();
     if (pid < 0) {
-        fprintf(stderr, "[amfid_handler] amfid not found, trying again in a few\n");
-        usleep(1666);
+        fprintf(stderr, "[amfid_handler] amfid not found, forcefully waking it up...\n");
+        system("launchctl start com.apple.MobileFileIntegrity >/dev/null 2>&1");
+        usleep(500000); /* wait 500ms for it to spin up */
         goto FindAMFI;
-        return;
     }
 
     if (!dlopen(MFI_FRAMEWORK, RTLD_NOW | RTLD_NOLOAD))
