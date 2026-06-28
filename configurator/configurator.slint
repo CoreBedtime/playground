@@ -26,6 +26,7 @@ export component MainWindow inherits Window {
     in property <string> status-message;
     in-out property <image> default-icon: @image-url("drill.png");
     in property <string> daemon-status;
+    in property <string> sip-status: "Unknown";
 
     callback save();
     callback edit-tweak(string);
@@ -56,6 +57,26 @@ export component MainWindow inherits Window {
         CheckBox {
             text: "Pause tweak injection";
             checked <=> root.pause-injection;
+        }
+
+        Text {
+            text: "System Status";
+            font-weight: 700;
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            Text {
+                text: "SIP Status: " + root.sip-status;
+                color: root.sip-status == "Enabled" ? #e74c3c : (root.sip-status == "Partially Disabled (Debugging Restrictions Off)" ? #2ecc71 : #e67e22);
+                vertical-alignment: center;
+            }
+            Text {
+                text: root.sip-status == "Enabled" ? "(Plugin Playground requires SIP to be disabled or partially disabled)" : "";
+                color: #e74c3c;
+                font-size: 11px;
+                vertical-alignment: center;
+            }
         }
 
         Text {

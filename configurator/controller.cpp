@@ -24,6 +24,7 @@ void Controller::load() {
     m_window.set_dev_tools_available(hasDeveloperTools());
     refreshTweaks();
     refreshDaemonStatus();
+    m_window.set_sip_status(slint::SharedString(sipStatusToString(checkSipStatus())));
 }
 
 void Controller::save() {

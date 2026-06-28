@@ -20,3 +20,13 @@ bool packageTweak(const std::string& name);
 TweakOptions loadTweakOptions(const std::string& name);
 bool saveTweakOptions(const std::string& name, const TweakOptions& opts);
 bool ensurePermissions();
+
+enum class SipStatus {
+    Enabled,
+    Disabled,
+    PartiallyDisabled,
+    Unknown
+};
+
+SipStatus checkSipStatus();
+std::string sipStatusToString(SipStatus status);
