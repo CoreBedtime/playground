@@ -68,44 +68,39 @@ static char* get_exe_path(void) {
     return path;
 }
 
-static bool check_whitelist(const char* path, const char* exe) {
+static bool check_list_match(const char* path, const char* exe) {
     FILE* f = fopen(path, "r");
     if (!f) return false;
-    char line[256];
-    while (fgets(line, sizeof(line), f)) {
-        size_t len = strlen(line);
-        if (len > 0 && line[len - 1] == '\n') line[len - 1] = '\0';
-        if (strstr(exe, line)) { fclose(f); return true; }
-    }
-    fclose(f);
-    return false;
-}
 
-static bool check_blacklist(const char* path, const char* exe) {
-    FILE* f = fopen(path, "r");
-    if (!f) return false;
     char line[256];
+    bool matched = false;
     while (fgets(line, sizeof(line), f)) {
         size_t len = strlen(line);
-        if (len > 0 && line[len - 1] == '\n') line[len - 1] = '\0';
-        if (strstr(exe, line)) { fclose(f); return true; }
+        while (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r'))
+            line[--len] = '\0';
+
+        char* p = line;
+        while (*p == ' ' || *p == '\t') p++;   /* skip leading whitespace */
+        if (*p == '\0' || *p == '#') continue; /* blank line or comment   */
+
+        if (strstr(exe, p)) { matched = true; break; }
     }
     fclose(f);
-    return false;
+    return matched;
 }
 
 static bool should_load_tweak(const char* dir, const char* name, const char* exe) {
     char wl[PATH_MAX], bl[PATH_MAX];
-//    snprintf(wl, sizeof(wl), "%s/%s.whitelist", dir, name);
+    snprintf(wl, sizeof(wl), "%s/%s.whitelist", dir, name);
     snprintf(bl, sizeof(bl), "%s/%s.blacklist", dir, name);
 
-    // if (check_whitelist(wl, exe))
-    //     return true;
+    if (access(wl, F_OK) == 0)
+        return check_list_match(wl, exe) ? true : false;
 
-    if (check_blacklist(bl, exe))
-        return false;
+    if (access(bl, F_OK) == 0)
+        return check_list_match(bl, exe) ? false : true;
 
-    return access(wl, F_OK) != 0;
+    return true;
 }
 
 static bool macho_has_framework(const char* base, size_t size, const char* framework) {
@@ -245,7 +240,7 @@ static bool check_dylib_options(const char* dir, const char* name, const char* e
     return should_load;
 }
 
-char* fangs_build_dyld_insert_libraries(bool useLegacyAmmonia) {
+char* fangs_build_dyld_insert_libraries(bool useLegacyAmmonia, char* path) {
     const char* dir = useLegacyAmmonia ? "/private/var/ammonia/core/tweaks" : "/opt/pluginplayground/tweaks";
 
     char* exe_path = get_exe_path();
@@ -263,10 +258,10 @@ char* fangs_build_dyld_insert_libraries(bool useLegacyAmmonia) {
         size_t nlen = strlen(name);
         if (nlen <= 6 || strcmp(name + nlen - 6, ".dylib") != 0) continue;
 
-        if (useLegacyAmmonia && !should_load_tweak(dir, name, exe_path))
+        if (!should_load_tweak(dir, name, path)
             continue;
 
-        if (!useLegacyAmmonia && !check_dylib_options(dir, name, exe_path))
+        if (!useLegacyAmmonia && !check_dylib_options(dir, name, path))
             continue;
 
         size_t plen = strlen(dir) + 1 + nlen + 1;

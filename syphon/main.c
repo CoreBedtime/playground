@@ -204,7 +204,7 @@ int main(void) {
                         int count = 0;
                         int max = env_out / sizeof(char *);
                         for (int i = 0; i < max && env_ptrs[i]; i++) count++;
-                        char *libs = fangs_build_dyld_insert_libraries(g_opts.useLegacyAmmonia);
+                        char *libs = fangs_build_dyld_insert_libraries(g_opts.useLegacyAmmonia, path);
                         if (libs) {
                             char inject_buf[4096];
                             snprintf(inject_buf, sizeof(inject_buf), "DYLD_INSERT_LIBRARIES=%s", libs);
