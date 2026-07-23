@@ -258,7 +258,7 @@ char* fangs_build_dyld_insert_libraries(bool useLegacyAmmonia, char* path) {
         size_t nlen = strlen(name);
         if (nlen <= 6 || strcmp(name + nlen - 6, ".dylib") != 0) continue;
 
-        if (!should_load_tweak(dir, name, path)
+        if (!should_load_tweak(dir, name, path))
             continue;
 
         if (!useLegacyAmmonia && !check_dylib_options(dir, name, path))
