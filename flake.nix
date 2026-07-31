@@ -108,7 +108,7 @@
           config = mkIf cfg.enable {
             environment.systemPackages = [ cfg.package ];
 
-            system.activationScripts.preUserActivation.text = ''
+            system.activationScripts."playground".text = ''
                 mkdir -p /opt/pluginplayground/tweaks
                 mkdir -p /var/log/pluginplayground
                 chmod 777 /opt/pluginplayground/tweaks
