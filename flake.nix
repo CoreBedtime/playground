@@ -10,7 +10,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        
+
         slintSrc = pkgs.fetchFromGitHub {
           owner = "slint-ui";
           repo = "slint";
@@ -109,13 +109,13 @@
             environment.systemPackages = [ cfg.package ];
 
             system.activationScripts.preUserActivation.text = ''
-              sudo mkdir -p /opt/pluginplayground/tweaks
-              sudo mkdir -p /var/log/pluginplayground
-              sudo chmod 777 /opt/pluginplayground/tweaks
-              sudo chmod 777 /var/log/pluginplayground
+                mkdir -p /opt/pluginplayground/tweaks
+                mkdir -p /var/log/pluginplayground
+                chmod 777 /opt/pluginplayground/tweaks
+                chmod 777 /var/log/pluginplayground
               if [ ! -f /opt/pluginplayground/current.options ]; then
-                sudo touch /opt/pluginplayground/current.options
-                sudo chmod 666 /opt/pluginplayground/current.options
+                touch /opt/pluginplayground/current.options
+                chmod 666 /opt/pluginplayground/current.options
               fi
             '';
 
