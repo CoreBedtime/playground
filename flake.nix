@@ -50,11 +50,6 @@
               --replace-fail 'list(APPEND slint_compiler_features "jemalloc")' ""
           '';
 
-          postPatch = ''
-            substituteInPlace CMakeLists.txt \
-              --replace-fail "--timestamp=none" ""
-          '';
-
           cmakeFlags = [
             "-DBUILD_CONFIGURATOR=ON"
             "-DFETCHCONTENT_SOURCE_DIR_SLINT=../slintSrc"
