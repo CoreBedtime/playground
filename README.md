@@ -3,6 +3,7 @@
 </p>
 
 # Plugin Playground
+# Fork by Salty - Using Objective-C for core options loading, and AppKit for user interface
 
 An open-source general-purpose runtime tweak system for macOS Apple Silicon.
 
@@ -41,18 +42,22 @@ If you use this option, the Ammonia daemon binary at `/private/var/ammonia/core/
 ## Build Requirements
 
 - macOS Apple Silicon (ARM64)
-- Xcode Command Line Tools (`xcode-select --install`)
 - CMake 3.16+
 - git
-- Internet connection (first build fetches Slint via FetchContent)
+- Xcode
 
 ## Build & Install
 
 ```sh
 sh ./install.sh
 ```
+## Use prebuild
 
-This builds everything and produces `PluginPlayground-1.0.0.pkg`. Run the `.pkg` to install, or pass a custom prefix path to install directly without the GUI installer. Uninstallation is as simple as `./uninstall.sh`.
+Use the PKG file from the packages section if you cannot build/do not want to.
+
+## Output
+
+This builds everything and produces `PluginPlayground-1.1.0.pkg`. Run the `.pkg` to install, or pass a custom prefix path to install directly without the GUI installer. Uninstallation is as simple as `./uninstall.sh`.
 
 ## Documentation
 
