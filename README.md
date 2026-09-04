@@ -3,7 +3,6 @@
 </p>
 
 # Plugin Playground
-# Fork by Salty - Using Objective-C for core options loading, and AppKit for user interface
 
 An open-source general-purpose runtime tweak system for macOS Apple Silicon.
 
