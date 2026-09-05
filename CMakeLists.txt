@@ -212,7 +212,7 @@ if(BUILD_CONFIGURATOR)
             "1.1"
 
         MACOSX_BUNDLE_BUNDLE_VERSION
-            "1.1.0"
+            "1.1.1"
 
         MACOSX_BUNDLE_BUNDLE_NAME
             "Plugin Playground Configurator"

@@ -1,6 +1,7 @@
 //Created by Salty on 8/4/26.
 
 #import "PPOptionsLoader.h"
+#import <dirent.h>
 
 static NSArray<NSString *> *gGlobalBlacklist = nil;
 
@@ -65,6 +66,9 @@ static NSArray<NSString *> *gGlobalBlacklist = nil;
         
         if ([line isEqualToString:name])
             return YES;
+        
+        if ([line isEqualToString:@"*"])
+            return YES;
     }
     
     return NO;
@@ -74,17 +78,20 @@ static NSArray<NSString *> *gGlobalBlacklist = nil;
                           withName:(NSString *)tweakName
                      toProcessName:(NSString *)processName{
     NSFileManager *fm = [NSFileManager defaultManager];
+    processName = [processName lastPathComponent];
     
     NSString *formatWhitelist = [NSString stringWithFormat:@"%@/%@.whitelist", dir, tweakName];
     NSString *formatBlacklist = [NSString stringWithFormat:@"%@/%@.blacklist", dir, tweakName];
     
-    if ([fm fileExistsAtPath:formatWhitelist])
-        return [PPOptionsLoader checkMatchToListInFile:formatWhitelist
-                                       withProcessName:processName] ? YES : NO;
+    BOOL insert = YES;
     
     if ([fm fileExistsAtPath:formatBlacklist])
-        return [PPOptionsLoader checkMatchToListInFile:formatBlacklist
-                                       withProcessName:processName] ? NO : YES;
+        insert = [PPOptionsLoader checkMatchToListInFile:formatBlacklist
+                                         withProcessName:processName] ? NO : YES;
+    
+    if ([fm fileExistsAtPath:formatWhitelist])
+        insert = [PPOptionsLoader checkMatchToListInFile:formatWhitelist
+                                         withProcessName:processName] ? YES : NO;
     
     return NO;
 }
@@ -239,18 +246,42 @@ static NSArray<NSString *> *gGlobalBlacklist = nil;
     return shouldBeLoadedToExe;
 }
 
+static NSArray<NSURL *> *DylibURLsInDirectory(NSString *directory)
+{
+    DIR *dir = opendir([directory UTF8String]);
+    if (!dir)
+        return nil;
+
+    NSMutableArray<NSURL *> *result = [NSMutableArray array];
+
+    struct dirent *entry;
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type == DT_DIR)
+            continue;
+
+        const char *name = entry->d_name;
+
+        const char *ext = strrchr(name, '.');
+        if (!ext || strcmp(ext, ".dylib") != 0)
+            continue;
+
+        NSString *path = [directory stringByAppendingPathComponent:
+                          [NSString stringWithUTF8String:name]];
+
+        [result addObject:[NSURL fileURLWithPath:path]];
+    }
+
+    closedir(dir);
+    return result;
+}
+
 + (PPFangsLibraries *)librariesForInsertionUsingAmmonia:(BOOL)ammonia toExePath:(const char *)path{
     NSString *dir = ammonia ? @"/private/var/ammonia/core/tweaks/" : @"/opt/pluginplayground/tweaks/";
-    NSURL *dirURL = [NSURL fileURLWithPath:dir isDirectory:YES];
     NSString *exePath = [NSString stringWithUTF8String:path];
     
-    NSFileManager *fm = [NSFileManager defaultManager];
-    
     NSError *err = nil;
-    NSArray<NSURL *> *files = [fm contentsOfDirectoryAtURL:dirURL
-                                includingPropertiesForKeys:nil
-                                                   options:NSDirectoryEnumerationSkipsHiddenFiles
-                                                     error:&err];
+    NSArray<NSURL *> *files = DylibURLsInDirectory(dir);
     
     if (err || [files count] < 1)
         return nil;
