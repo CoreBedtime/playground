@@ -74,10 +74,13 @@ static NSArray<NSString *> *gGlobalBlacklist = nil;
     return NO;
 }
 
++ (BOOL)fileExistsAtPath:(NSString *)path {
+    return access([path fileSystemRepresentation], F_OK) == 0;
+}
+
 + (BOOL)shouldLoadTweakInDirectory:(NSString *)dir
                           withName:(NSString *)tweakName
                      toProcessName:(NSString *)processName{
-    NSFileManager *fm = [NSFileManager defaultManager];
     processName = [processName lastPathComponent];
     
     NSString *formatWhitelist = [NSString stringWithFormat:@"%@/%@.whitelist", dir, tweakName];
@@ -85,11 +88,11 @@ static NSArray<NSString *> *gGlobalBlacklist = nil;
     
     BOOL insert = YES;
     
-    if ([fm fileExistsAtPath:formatBlacklist])
+    if ([PPOptionsLoader fileExistsAtPath:formatBlacklist])
         insert = [PPOptionsLoader checkMatchToListInFile:formatBlacklist
                                          withProcessName:processName] ? NO : YES;
     
-    if ([fm fileExistsAtPath:formatWhitelist])
+    if ([PPOptionsLoader fileExistsAtPath:formatWhitelist])
         insert = [PPOptionsLoader checkMatchToListInFile:formatWhitelist
                                          withProcessName:processName] ? YES : NO;
     
