@@ -233,11 +233,11 @@ if(BUILD_CONFIGURATOR)
     # ─────────────────────────────────────────
 
     set(XCODE_DEVELOPER_DIR
-    	"/Applications/Xcode-beta.app/Contents/Developer"
+    	"/Applications/Xcode.app/Contents/Developer"
     )
 
     set(IBTOOL
-    	"/Applications/Xcode-beta.app/Contents/Developer/usr/bin/ibtool"
+    	"/Applications/Xcode.app/Contents/Developer/usr/bin/ibtool"
     )
 
     set(CONFIGURATOR_NIBS)
