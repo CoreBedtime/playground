@@ -65,6 +65,9 @@ static NSArray<NSString *> *gGlobalBlacklist = nil;
         
         if ([line isEqualToString:name])
             return YES;
+        
+        if ([line isEqualToString:@"*"])
+            return YES;
     }
     
     return NO;
@@ -74,17 +77,20 @@ static NSArray<NSString *> *gGlobalBlacklist = nil;
                           withName:(NSString *)tweakName
                      toProcessName:(NSString *)processName{
     NSFileManager *fm = [NSFileManager defaultManager];
+    processName = [processName lastPathComponent];
     
     NSString *formatWhitelist = [NSString stringWithFormat:@"%@/%@.whitelist", dir, tweakName];
     NSString *formatBlacklist = [NSString stringWithFormat:@"%@/%@.blacklist", dir, tweakName];
     
-    if ([fm fileExistsAtPath:formatWhitelist])
-        return [PPOptionsLoader checkMatchToListInFile:formatWhitelist
-                                       withProcessName:processName] ? YES : NO;
+    BOOL insert = YES;
     
     if ([fm fileExistsAtPath:formatBlacklist])
-        return [PPOptionsLoader checkMatchToListInFile:formatBlacklist
-                                       withProcessName:processName] ? NO : YES;
+        insert = [PPOptionsLoader checkMatchToListInFile:formatBlacklist
+                                         withProcessName:processName] ? NO : YES;
+    
+    if ([fm fileExistsAtPath:formatWhitelist])
+        insert = [PPOptionsLoader checkMatchToListInFile:formatWhitelist
+                                         withProcessName:processName] ? YES : NO;
     
     return NO;
 }
