@@ -42,6 +42,7 @@ If you use this option, the Ammonia daemon binary at `/private/var/ammonia/core/
 
 - macOS Apple Silicon (ARM64)
 - Xcode Command Line Tools (`xcode-select --install`)
+- Xcode
 - CMake 3.16+
 - git
 
@@ -51,7 +52,8 @@ If you use this option, the Ammonia daemon binary at `/private/var/ammonia/core/
 sh ./install.sh
 ```
 
-This builds everything and produces `PluginPlayground-1.1.1.pkg`. Run the `.pkg` to install, or pass a custom prefix path to install directly without the GUI installer. Uninstallation is as simple as `./uninstall.sh`.
+This builds everything and produces `PluginPlayground-1.1.1.pkg`. Run the `.pkg` to install. 
+Uninstallation is as simple as `./uninstall.sh`.
 
 ## Documentation
 
