@@ -51,44 +51,31 @@ NSString* const plistPath = @"/Library/LaunchDaemons/com.pluginplayground.grant.
 + (void)addPlist {
     if ([PPDaemonStatus plistExists])
         return;
+    
+    NSDictionary *plistDict = @{
+        @"Label" : @"com.pluginplayground.grant",
+        @"ProgramArguments" : @[@"/opt/pluginplayground/bin/grant"],
+        @"RunAtLoad" : @YES,
+        @"KeepAlive" : @YES,
+        @"StandardOutPath" : @"/var/log/pluginplayground/grant.log",
+        @"StandardErrorPath" : @"/var/log/pluginplayground/grant.err"
+    };
 
-    NSString *plist =
-        @"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-        "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" "
-        "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
-        "<plist version=\"1.0\">\n"
-        "<dict>\n"
-        "    <key>Label</key>\n"
-        "    <string>com.pluginplayground.grant</string>\n"
-        "    <key>ProgramArguments</key>\n"
-        "    <array>\n"
-        "        <string>/opt/pluginplayground/bin/grant</string>\n"
-        "    </array>\n"
-        "    <key>RunAtLoad</key>\n"
-        "    <true/>\n"
-        "    <key>KeepAlive</key>\n"
-        "    <true/>\n"
-        "    <key>StandardOutPath</key>\n"
-        "    <string>/var/log/pluginplayground/grant.log</string>\n"
-        "    <key>StandardErrorPath</key>\n"
-        "    <string>/var/log/pluginplayground/grant.err</string>\n"
-        "</dict>\n"
-        "</plist>\n";
+    NSData *plistData =
+        [NSPropertyListSerialization dataWithPropertyList:plistDict
+                                                   format:NSPropertyListXMLFormat_v1_0
+                                                  options:0
+                                                    error:nil];
 
-    NSString *escapedPlist =
-        [plist stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
-    escapedPlist =
-        [escapedPlist stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
-    escapedPlist =
-        [escapedPlist stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"];
+    NSString *base64 = [plistData base64EncodedStringWithOptions:0];
 
     NSString *script =
         [NSString stringWithFormat:
-            @"do shell script \"printf \\\"%%s\\\" \\\"%@\\\" > %@ && "
+            @"do shell script \"echo %@ | base64 -D > %@ && "
              "chown root:wheel %@ && "
              "chmod 644 %@ && "
              "launchctl load %@\" with administrator privileges",
-             escapedPlist,
+             base64,
              plistPath,
              plistPath,
              plistPath,
