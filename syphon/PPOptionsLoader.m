@@ -93,7 +93,7 @@ static NSArray<NSString *> *gGlobalBlacklist = nil;
         insert = [PPOptionsLoader checkMatchToListInFile:formatWhitelist
                                          withProcessName:processName] ? YES : NO;
     
-    return NO;
+    return insert;
 }
 
 + (BOOL)machoHasFrameworkWithBase:(const char *)base size:(size_t)size framework:(const char *)framework{
