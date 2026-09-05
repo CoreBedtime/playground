@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-VERSION="1.1.0"
+VERSION="1.1.1"
 OUTPUT="${1:-PluginPlayground-${VERSION}.pkg}"
 SRC="$(cd "$(dirname "$0")" && pwd)"
 
@@ -42,4 +42,4 @@ productbuild --distribution "$SRC/installer/Distribution.xml" \
 
 echo "[+] Created $OUTPUT"
 echo "    Install: sudo installer -pkg \"$OUTPUT\" -target /"
-open PluginPlayground-1.1.0.pkg
+open PluginPlayground-1.1.1.pkg

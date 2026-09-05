@@ -212,7 +212,7 @@ if(BUILD_CONFIGURATOR)
             "1.1"
 
         MACOSX_BUNDLE_BUNDLE_VERSION
-            "1.1.0"
+            "1.1.1"
 
         MACOSX_BUNDLE_BUNDLE_NAME
             "Plugin Playground Configurator"
@@ -233,11 +233,11 @@ if(BUILD_CONFIGURATOR)
     # ─────────────────────────────────────────
 
     set(XCODE_DEVELOPER_DIR
-    	"/Applications/Xcode.app/Contents/Developer"
+    	"/Applications/Xcode-beta.app/Contents/Developer"
     )
 
     set(IBTOOL
-    	"/Applications/Xcode.app/Contents/Developer/usr/bin/ibtool"
+    	"/Applications/Xcode-beta.app/Contents/Developer/usr/bin/ibtool"
     )
 
     set(CONFIGURATOR_NIBS)
