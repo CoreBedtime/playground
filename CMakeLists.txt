@@ -164,6 +164,7 @@ if(BUILD_CONFIGURATOR)
         configurator/Services/PPDaemonStatus.m
         configurator/Services/PPTweaksCollection.m
 	configurator/Services/PPPrivledgedWriter.m
+	configurator/Services/ASSIPStatus.mm
 
         configurator/Controllers/PPListEditorController.m
         configurator/Controllers/PPMainViewController.m
@@ -213,7 +214,7 @@ if(BUILD_CONFIGURATOR)
             "1.1"
 
         MACOSX_BUNDLE_BUNDLE_VERSION
-            "1.1.3"
+            "1.1.4"
 
         MACOSX_BUNDLE_BUNDLE_NAME
             "Plugin Playground Configurator"

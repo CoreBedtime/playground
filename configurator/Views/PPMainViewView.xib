@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="25094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="25098" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="25094"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="25098"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,11 +18,11 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="c22-O7-iKe">
-            <rect key="frame" x="0.0" y="0.0" width="517" height="480"/>
+            <rect key="frame" x="0.0" y="0.0" width="517" height="575"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <box fixedFrame="YES" title="Daemon" translatesAutoresizingMaskIntoConstraints="NO" id="8mO-ye-fM6">
-                    <rect key="frame" x="20" y="244" width="477" height="53"/>
+                    <rect key="frame" x="20" y="339" width="477" height="53"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="lfa-dw-he1">
                         <rect key="frame" x="0.0" y="0.0" width="477" height="41"/>
@@ -68,21 +68,21 @@
                     </view>
                 </box>
                 <box fixedFrame="YES" title="Tweaks" translatesAutoresizingMaskIntoConstraints="NO" id="u9V-Ee-XOH">
-                    <rect key="frame" x="20" y="37" width="477" height="199"/>
+                    <rect key="frame" x="20" y="37" width="477" height="233"/>
                     <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                     <view key="contentView" id="sZS-f3-dhq">
-                        <rect key="frame" x="0.0" y="0.0" width="477" height="187"/>
+                        <rect key="frame" x="0.0" y="0.0" width="477" height="221"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="XGa-wT-T0s">
-                                <rect key="frame" x="0.0" y="0.0" width="477" height="187"/>
+                                <rect key="frame" x="0.0" y="0.0" width="477" height="221"/>
                                 <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Mha-jQ-Hah">
-                                    <rect key="frame" x="0.0" y="0.0" width="477" height="187"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="477" height="221"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="DZD-Oj-q80">
-                                            <rect key="frame" x="0.0" y="0.0" width="467" height="177"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="467" height="211"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" red="0.11764705882352941" green="0.11764705882352941" blue="0.11764705882352941" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -175,7 +175,7 @@
                     </view>
                 </box>
                 <box fixedFrame="YES" title="Global Settings" translatesAutoresizingMaskIntoConstraints="NO" id="npd-Hz-a9h">
-                    <rect key="frame" x="20" y="305" width="477" height="155"/>
+                    <rect key="frame" x="20" y="400" width="477" height="155"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="gHu-Ys-Ubl">
                         <rect key="frame" x="0.0" y="0.0" width="477" height="143"/>
@@ -259,10 +259,41 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <box fixedFrame="YES" title="System Integrity Protection (SIP) Status" translatesAutoresizingMaskIntoConstraints="NO" id="ZvB-ip-ENi">
+                    <rect key="frame" x="20" y="278" width="477" height="53"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <view key="contentView" id="rYI-jY-bav">
+                        <rect key="frame" x="0.0" y="0.0" width="477" height="41"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tCH-N2-oiY">
+                                <rect key="frame" x="20" y="-3" width="48" height="48"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="NSStatusPartiallyAvailable" id="Brf-Gi-9wy"/>
+                                <connections>
+                                    <binding destination="hmB-4g-uZl" name="value" keyPath="self.sipStatusIndicatorImage" id="Sah-yZ-4pR"/>
+                                </connections>
+                            </imageView>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GOy-wp-lBH">
+                                <rect key="frame" x="76" y="13" width="252" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="STATUS" id="lqd-bx-3lB">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="hmB-4g-uZl" name="value" keyPath="self.sipStatusString" id="v9X-N9-qQj"/>
+                                </connections>
+                            </textField>
+                        </subviews>
+                    </view>
+                </box>
             </subviews>
-            <point key="canvasLocation" x="157.5" y="154"/>
+            <point key="canvasLocation" x="157.5" y="106.5"/>
         </customView>
         <userDefaultsController representsSharedInstance="YES" id="mVG-b2-82Z"/>
+        <customObject id="hmB-4g-uZl" customClass="ASSIPStatus"/>
     </objects>
     <resources>
         <image name="NSRefreshTemplate" width="18" height="21"/>
